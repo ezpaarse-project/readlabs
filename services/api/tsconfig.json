@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    // Used by ESBuild
+    "paths": {
+      "~/*": [
+        "./src/*"
+      ]
+    },
+  }
+}

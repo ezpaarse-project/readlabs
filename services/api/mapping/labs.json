@@ -1,0 +1,529 @@
+{
+  "mappings": {
+    "_doc": {
+      "properties": {
+        "@timestamp": {
+          "type": "date"
+        },
+        "categorieStructure": {
+          "type": "keyword"
+        },
+        "codeUnite": {
+          "type": "keyword"
+        },
+        "dateCreation": {
+          "type": "date",
+          "format": "iso8601"
+        },
+        "delegationRegionaleCode": {
+          "type": "long"
+        },
+        "delegationRegionaleLibelle": {
+          "type": "keyword"
+        },
+        "dernierEtablissementRattachementDateFinValidite": {
+          "type": "date",
+          "format": "iso8601"
+        },
+        "dernierEtablissementRattachementLibelle": {
+          "type": "keyword"
+        },
+        "derniereImplantationDelegationRegionaleCode": {
+          "type": "long"
+        },
+        "derniereImplantationDelegationRegionaleLibelle": {
+          "type": "keyword"
+        },
+        "derniereImplantationEtablissement": {
+          "properties": {
+            "Voie": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 256
+                }
+              }
+            },
+            "boitePostale": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 256
+                }
+              }
+            },
+            "codePostalEtranger": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 256
+                }
+              }
+            },
+            "communeEtrangere": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 256
+                }
+              }
+            },
+            "communeFrancaise": {
+              "properties": {
+                "codePostal": {
+                  "type": "text",
+                  "fields": {
+                    "keyword": {
+                      "type": "keyword",
+                      "ignore_above": 256
+                    }
+                  }
+                },
+                "commune": {
+                  "type": "text",
+                  "fields": {
+                    "keyword": {
+                      "type": "keyword",
+                      "ignore_above": 256
+                    }
+                  }
+                },
+                "idReseda": {
+                  "type": "text",
+                  "fields": {
+                    "keyword": {
+                      "type": "keyword",
+                      "ignore_above": 256
+                    }
+                  }
+                },
+                "libelleAcheminement": {
+                  "type": "text",
+                  "fields": {
+                    "keyword": {
+                      "type": "keyword",
+                      "ignore_above": 256
+                    }
+                  }
+                },
+                "ligne5Hexaposte": {
+                  "type": "text",
+                  "fields": {
+                    "keyword": {
+                      "type": "keyword",
+                      "ignore_above": 256
+                    }
+                  }
+                }
+              }
+            },
+            "complementAdresse": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 256
+                }
+              }
+            },
+            "courrielContactWeb": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 256
+                }
+              }
+            },
+            "delegationRegionale": {
+              "properties": {
+                "code": {
+                  "type": "text",
+                  "fields": {
+                    "keyword": {
+                      "type": "keyword",
+                      "ignore_above": 256
+                    }
+                  }
+                },
+                "idReseda": {
+                  "type": "text",
+                  "fields": {
+                    "keyword": {
+                      "type": "keyword",
+                      "ignore_above": 256
+                    }
+                  }
+                },
+                "libelle": {
+                  "type": "text",
+                  "fields": {
+                    "keyword": {
+                      "type": "keyword",
+                      "ignore_above": 256
+                    }
+                  }
+                }
+              }
+            },
+            "departement": {
+              "properties": {
+                "code": {
+                  "type": "text",
+                  "fields": {
+                    "keyword": {
+                      "type": "keyword",
+                      "ignore_above": 256
+                    }
+                  }
+                },
+                "idReseda": {
+                  "type": "text",
+                  "fields": {
+                    "keyword": {
+                      "type": "keyword",
+                      "ignore_above": 256
+                    }
+                  }
+                },
+                "libelle": {
+                  "type": "text",
+                  "fields": {
+                    "keyword": {
+                      "type": "keyword",
+                      "ignore_above": 256
+                    }
+                  }
+                }
+              }
+            },
+            "etablissementImplantation": {
+              "properties": {
+                "code": {
+                  "type": "text",
+                  "fields": {
+                    "keyword": {
+                      "type": "keyword",
+                      "ignore_above": 256
+                    }
+                  }
+                },
+                "idReseda": {
+                  "type": "text",
+                  "fields": {
+                    "keyword": {
+                      "type": "keyword",
+                      "ignore_above": 256
+                    }
+                  }
+                },
+                "libelle": {
+                  "type": "text",
+                  "fields": {
+                    "keyword": {
+                      "type": "keyword",
+                      "ignore_above": 256
+                    }
+                  }
+                }
+              }
+            },
+            "idOldImplantation": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 256
+                }
+              }
+            },
+            "infrastructure": {
+              "properties": {
+                "code": {
+                  "type": "text",
+                  "fields": {
+                    "keyword": {
+                      "type": "keyword",
+                      "ignore_above": 256
+                    }
+                  }
+                },
+                "idReseda": {
+                  "type": "text",
+                  "fields": {
+                    "keyword": {
+                      "type": "keyword",
+                      "ignore_above": 256
+                    }
+                  }
+                },
+                "libelle": {
+                  "type": "text",
+                  "fields": {
+                    "keyword": {
+                      "type": "keyword",
+                      "ignore_above": 256
+                    }
+                  }
+                }
+              }
+            },
+            "numOrdre": {
+              "type": "long"
+            },
+            "numVoie": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 256
+                }
+              }
+            },
+            "pays": {
+              "properties": {
+                "codeIso2": {
+                  "type": "text",
+                  "fields": {
+                    "keyword": {
+                      "type": "keyword",
+                      "ignore_above": 256
+                    }
+                  }
+                },
+                "codeIso3": {
+                  "type": "text",
+                  "fields": {
+                    "keyword": {
+                      "type": "keyword",
+                      "ignore_above": 256
+                    }
+                  }
+                },
+                "idReseda": {
+                  "type": "text",
+                  "fields": {
+                    "keyword": {
+                      "type": "keyword",
+                      "ignore_above": 256
+                    }
+                  }
+                },
+                "libelle": {
+                  "type": "text",
+                  "fields": {
+                    "keyword": {
+                      "type": "keyword",
+                      "ignore_above": 256
+                    }
+                  }
+                }
+              }
+            },
+            "region": {
+              "properties": {
+                "code": {
+                  "type": "text",
+                  "fields": {
+                    "keyword": {
+                      "type": "keyword",
+                      "ignore_above": 256
+                    }
+                  }
+                },
+                "idReseda": {
+                  "type": "text",
+                  "fields": {
+                    "keyword": {
+                      "type": "keyword",
+                      "ignore_above": 256
+                    }
+                  }
+                },
+                "libelle": {
+                  "type": "text",
+                  "fields": {
+                    "keyword": {
+                      "type": "keyword",
+                      "ignore_above": 256
+                    }
+                  }
+                }
+              }
+            },
+            "sHON": {
+              "type": "long"
+            },
+            "site": {
+              "properties": {
+                "code": {
+                  "type": "text",
+                  "fields": {
+                    "keyword": {
+                      "type": "keyword",
+                      "ignore_above": 256
+                    }
+                  }
+                },
+                "idReseda": {
+                  "type": "text",
+                  "fields": {
+                    "keyword": {
+                      "type": "keyword",
+                      "ignore_above": 256
+                    }
+                  }
+                },
+                "libelle": {
+                  "type": "text",
+                  "fields": {
+                    "keyword": {
+                      "type": "keyword",
+                      "ignore_above": 256
+                    }
+                  }
+                }
+              }
+            },
+            "sncMere": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 256
+                }
+              }
+            },
+            "surfaceUtile": {
+              "type": "long",
+              "null_value": 0
+            }
+          }
+        },
+        "derniereImplantations": {
+          "type": "keyword"
+        },
+        "derniereImplantationsCodeEmplacement": {
+          "type": "long"
+        },
+        "derniereImplantationsCodeEmplacementLibelle": {
+          "type": "keyword"
+        },
+        "derniereImplantationsCodeStructure": {
+          "type": "keyword"
+        },
+        "derniereImplantationsCodeUnite": {
+          "type": "keyword"
+        },
+        "derniereImplantationsDateDebut": {
+          "type": "date",
+          "format": "iso8601"
+        },
+        "derniereImplantationsDateFin": {
+          "type": "date",
+          "format": "iso8601"
+        },
+        "derniereImplantationsInstitutRattachementLibelle": {
+          "type": "keyword"
+        },
+        "derniereImplantationsLibelle": {
+          "type": "keyword"
+        },
+        "effectifUnite": {
+          "type": "long",
+          "null_value": 0
+        },
+        "etatStructure": {
+          "type": "keyword"
+        },
+        "ezMetaDate": {
+          "type": "date",
+          "format": "iso8601"
+        },
+        "idReseda": {
+          "type": "long"
+        },
+        "intituleUnite": {
+          "type": "keyword"
+        },
+        "numeroUnite": {
+          "type": "long"
+        },
+        "personnels": {
+          "properties": {
+            "code": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 256
+                }
+              }
+            },
+            "libelle": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 256
+                }
+              }
+            },
+            "total": {
+              "type": "long"
+            }
+          }
+        },
+        "personnels_APPR": {
+          "type": "long",
+          "null_value": 0
+        },
+        "personnels_A_MODIFIER": {
+          "type": "long",
+          "null_value": 0
+        },
+        "personnels_CH": {
+          "type": "long",
+          "null_value": 0
+        },
+        "personnels_DOCT": {
+          "type": "long",
+          "null_value": 0
+        },
+        "personnels_ENS_CH": {
+          "type": "long",
+          "null_value": 0
+        },
+        "personnels_IT": {
+          "type": "long",
+          "null_value": 0
+        },
+        "personnels_POST_DOCT": {
+          "type": "long",
+          "null_value": 0
+        },
+        "personnels_STAG_ETUD": {
+          "type": "long",
+          "null_value": 0
+        },
+        "personnels_VACAT": {
+          "type": "long",
+          "null_value": 0
+        },
+        "sigleUnite": {
+          "type": "keyword"
+        },
+        "typeUniteCode": {
+          "type": "keyword"
+        },
+        "typeUniteLibelle": {
+          "type": "keyword"
+        }
+      }
+    }
+  }
+}

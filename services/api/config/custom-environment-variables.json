@@ -1,0 +1,17 @@
+{
+  "nodeEnv": "NODE_ENV",
+  "timezone": "TIMEZONE",
+  "redis": {
+    "host": "REDIS_HOST",
+    "port": "REDIS_PORT",
+    "password": "REDIS_PASSWORD"
+  },
+  "elasticsearch": {
+    "nodes": "ELASTICSEARCH_NODES",
+    "username": "ELASTICSEARCH_USERNAME",
+    "password": "ELASTICSEARCH_PASSWORD",
+    "apikey": "ELASTICSEARCH_APIKEY",
+    "requiredStatus": "ELASTICSEARCH_REQUIRED_STATUS"
+  },
+  "apikey": "ADMIN_APIKEY"
+}
