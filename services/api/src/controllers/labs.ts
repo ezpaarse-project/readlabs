@@ -7,6 +7,7 @@ import { search } from '~/lib/elastic'
  */
 export async function getLabsController(request, reply) {
   const { ids } = request.body;
+  const { attributes } = request.data;
 
   const body = {
     query: {
@@ -20,6 +21,7 @@ export async function getLabsController(request, reply) {
         ],
       },
     },
+    _source: attributes,
   };
   
   const labs =  await search('int_cnrs-unites', 10, body);

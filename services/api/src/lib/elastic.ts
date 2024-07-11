@@ -5,7 +5,7 @@ import { readFileSync } from 'fs';
 
 import { nodeEnv, elasticsearch } from 'config';
 
-import { appLogger } from '~/lib/appLogger';
+import { appLogger } from '~/lib/logger/appLogger';
 
 const isProd = (nodeEnv === 'production');
 
@@ -29,7 +29,6 @@ if (isProd) {
 let elasticClient;
 
 export async function initClient() {
-  console.log(elasticsearch);
   try {
     elasticClient = new Client({
       nodes: elasticNodes,

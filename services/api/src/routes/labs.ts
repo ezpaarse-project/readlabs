@@ -2,7 +2,7 @@ import type { FastifyPluginAsync } from 'fastify';
 
 import { getLabsController } from '~/controllers/labs';
 
-import { user } from '~/plugins/user';
+import { user, checkApikeyConfig } from '~/plugins/user';
 
 const router: FastifyPluginAsync = async (fastify) => {
   fastify.route({
@@ -19,13 +19,19 @@ const router: FastifyPluginAsync = async (fastify) => {
             },
             minItems: 1,
             uniqueItems: true
+          },
+          attributes: {
+            type: 'array',
+            isAllowedAttribute: true,
+            items: { type: 'string' },
+            minItems: 1
           }
         },
         required: ['ids'],
         additionalProperties: false
       }
     },
-    preHandler: user,
+    preHandler: [user, checkApikeyConfig],
     handler: async (request, reply) => {
       await getLabsController(request, reply);
     },

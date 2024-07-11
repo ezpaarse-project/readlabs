@@ -4,7 +4,7 @@ import { createClient, RedisClientType } from 'redis'
 import { promisify } from 'util'
 import { createHash } from 'crypto'
 
-import { appLogger } from '~/lib/appLogger';
+import { appLogger } from '~/lib/logger/appLogger';
 
 import { redis } from 'config';
 

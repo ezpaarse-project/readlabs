@@ -1,5 +1,4 @@
 import type { FastifyPluginAsync } from 'fastify';
-import Ajv from 'ajv';
 
 import { admin } from '~/plugins/admin';
 import { all } from '~/plugins/all';
@@ -13,20 +12,6 @@ import {
   removeApiKeyController,
   loadDevController,
 } from '~/controllers/apikey';
-
-import allowedAttributes from '~/../mapping/labs.attributes.json'
-
-const ajv = new Ajv()
-
-ajv.addKeyword({
-  keyword: 'isAllowedAttribute',
-  validate: (schema: boolean, data: string[]) => {
-    console.log(data);
-    if (!Array.isArray(data)) return false;
-    return data.every((item: string) => allowedAttributes.includes(item));
-  },
-  errors: false
-})
 
 function getSchema(isCreate: boolean) {
   return {
@@ -50,13 +35,7 @@ function getSchema(isCreate: boolean) {
   }
 }
 
-
-
 const router: FastifyPluginAsync = async (fastify) => {
-
-  fastify.setValidatorCompiler(({ schema }) => {
-    return ajv.compile(schema)
-  })
 
   fastify.route({
     method: 'GET',
@@ -104,7 +83,6 @@ const router: FastifyPluginAsync = async (fastify) => {
     schema: {},
     preHandler: admin,
     handler: async (request, reply) => {
-      console.log(request.params)
       await removeApiKeyController(request, reply);
     },
   });

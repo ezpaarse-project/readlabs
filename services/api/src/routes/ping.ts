@@ -22,16 +22,6 @@ const router: FastifyPluginAsync = async (fastify) => {
       reply.code(204)
     },
   });
-
-  fastify.route({
-    method: 'GET',
-    url: '/healthcheck',
-    schema: {},
-    preHandler: all,
-    handler: (request, reply) => {
-      reply.code(204)
-    },
-  });
 };
 
 export default router;
