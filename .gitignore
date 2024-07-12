@@ -3,3 +3,4 @@ ssl/
 node_modules/
 log/
 readlabs.env.local.sh
+settings.json

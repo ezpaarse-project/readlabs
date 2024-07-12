@@ -10,8 +10,7 @@
     "nodes": "ELASTICSEARCH_NODES",
     "username": "ELASTICSEARCH_USERNAME",
     "password": "ELASTICSEARCH_PASSWORD",
-    "apikey": "ELASTICSEARCH_APIKEY",
-    "requiredStatus": "ELASTICSEARCH_REQUIRED_STATUS"
+    "apikey": "ELASTICSEARCH_APIKEY"
   },
   "apikey": "ADMIN_APIKEY"
 }

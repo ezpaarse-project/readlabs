@@ -10,8 +10,7 @@
     "nodes": "http://elastic:9200",
     "username": "elastic",
     "password": "changeme",
-    "apikey": "",
-    "requiredStatus": "green"
+    "apikey": ""
   },
   "paths": {
     "log": {
