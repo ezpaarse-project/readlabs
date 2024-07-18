@@ -5,14 +5,6 @@ import { get } from '~/lib/redis';
 
 import appLogger from '~/lib/logger/appLogger';
 
-interface FastifyRequestApiKey extends FastifyRequest {
-  query: { apikey: string };
-  headers: { 'x-api-key': string };
-  body: {
-    attributes?: string[];
-  }
-}
-
 /**
  * Get config of API key.
  *
@@ -40,10 +32,18 @@ async function getConfigApiKey(key: string): Promise<ApiKeyConfig | null> {
  * @param reply
  */
 export async function user(
-  request: FastifyRequestApiKey,
+  request: FastifyRequest<{
+    Querystring: {
+      apikey: string
+    },
+    Body: {
+      attributes: string[]
+      ids: string[]
+    }
+  }>,
   reply: FastifyReply,
 ): Promise<void> {
-  const keyFromHeaders = request.headers['x-api-key'];
+  const keyFromHeaders = Array.isArray(request.headers['x-api-key']) ? request.headers['x-api-key'][0] : request.headers['x-api-key'];
   const keyFromQuery = request.query.apikey;
 
   if (keyFromHeaders && keyFromQuery && keyFromHeaders !== keyFromQuery) {
@@ -83,9 +83,6 @@ export async function checkApiKeyConfig(
       apikey: string
     },
     Body: {
-      attributes: string[]
-    }
-    data: {
       attributes: string[]
     }
   }>,

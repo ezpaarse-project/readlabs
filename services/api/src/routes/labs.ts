@@ -31,7 +31,6 @@ const router: FastifyPluginAsync = async (fastify) => {
         additionalProperties: false,
       },
     },
-    // @ts-ignore
     preHandler: [user, checkApiKeyConfig],
     handler: getLabsController,
   });

@@ -12,7 +12,11 @@ import { search } from '~/lib/elastic';
  */
 export default async function getLabsController(
   request: FastifyRequest<{
+    Querystring: {
+      apikey: string
+    },
     Body: {
+      attributes: string[]
       ids: string[]
     }
   }>,
