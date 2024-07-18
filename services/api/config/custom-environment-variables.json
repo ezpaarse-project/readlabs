@@ -9,8 +9,7 @@
   "elasticsearch": {
     "nodes": "ELASTICSEARCH_NODES",
     "username": "ELASTICSEARCH_USERNAME",
-    "password": "ELASTICSEARCH_PASSWORD",
-    "apikey": "ELASTICSEARCH_APIKEY"
+    "password": "ELASTICSEARCH_PASSWORD"
   },
   "apikey": "ADMIN_APIKEY"
 }

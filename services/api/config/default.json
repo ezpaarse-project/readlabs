@@ -9,8 +9,7 @@
   "elasticsearch": {
     "nodes": "http://elastic:9200",
     "username": "elastic",
-    "password": "changeme",
-    "apikey": ""
+    "password": "changeme"
   },
   "paths": {
     "log": {

@@ -1,15 +1,23 @@
-import { readFile } from 'fs/promises'
-import { resolve } from 'path'
-import { createClient, RedisClientType } from 'redis'
-import { promisify } from 'util'
-import { createHash } from 'crypto'
-
-import { appLogger } from '~/lib/logger/appLogger';
+import { createClient, RedisClientType } from 'redis';
+import { promisify } from 'util';
+import { createHash } from 'crypto';
 
 import { redis } from 'config';
+import appLogger from '~/lib/logger/appLogger';
+
+import type { ApiKeyConfig, ApiKey } from '~/models/apikey';
 
 let redisClient: RedisClientType | undefined;
 
+let redisGet: ReturnType<typeof promisify> | undefined;
+let redisPing: ReturnType<typeof promisify> | undefined;
+let redisSet: ReturnType<typeof promisify> | undefined;
+let redisDel: ReturnType<typeof promisify> | undefined;
+let redisKeys: ReturnType<typeof promisify> | undefined;
+
+/**
+ * Init redis client.
+ */
 export function initClient() {
   try {
     redisClient = createClient({
@@ -20,26 +28,30 @@ export function initClient() {
       },
       password: redis.password,
     });
-    appLogger.info('[redis]: client is created')
+    appLogger.info('[redis]: client is created');
   } catch (err) {
-    appLogger.error(`[redis]: Cannot create redis client - ${err}`)
+    appLogger.error(`[redis]: Cannot create redis client - ${err}`);
   }
 
-  redisClient.get = promisify(redisClient.get);
-  redisClient.ping = promisify(redisClient.ping);
-  redisClient.set = promisify(redisClient.set);
-  redisClient.del = promisify(redisClient.del);
-  redisClient.keys = promisify(redisClient.keys);
+  redisGet = promisify(redisClient.get);
+  redisPing = promisify(redisClient.ping);
+  redisSet = promisify(redisClient.set);
+  redisDel = promisify(redisClient.del);
+  redisKeys = promisify(redisClient.keys);
 }
 
 /**
  * Ping redis service.
  *
- * @returns {Promise<boolean>} ping
+ * @returns ping.
  */
-export async function ping() {
+export async function ping(): Promise<boolean> {
   try {
-    await redisClient.ping();
+    if (!redisPing) {
+      throw new Error('[redis]: Client is not created');
+    }
+
+    await redisPing();
   } catch (err) {
     appLogger.error(`[redis]: Cannot ping ${redis.host}:${redis.port}`, err);
     return false;
@@ -49,10 +61,11 @@ export async function ping() {
 }
 
 /**
- * Start connection to redis
- * @returns {Promise<boolean>} connected or not
+ * Start connection to redis.
+ *
+ * @returns is started.
  */
-export async function startConnection() {
+export async function startConnection(): Promise<boolean> {
   try {
     await redisClient.connect();
   } catch (err) {
@@ -64,32 +77,42 @@ export async function startConnection() {
 }
 
 /**
- * Check if apikey exist
- * @param apikey Apikey.
+ * Check if apikey exist.
  *
- * @returns Apikey config.
+ * @param apikey ApiKey.
+ *
+ * @returns Is exist.
  */
 export async function check(apikey: string): Promise<boolean> {
-  return !!await redisClient.get(apikey);
+  if (!redisGet) {
+    throw new Error('[redis]: Client is not created');
+  }
+
+  return !!await redisGet(apikey);
 }
 
 /**
  * Get apikey config
- * @returns {Promise<boolean>} connected or not
+ *
+ * @returns apikey config
  */
-export async function get(apikey) {
+export async function get(apikey: string): Promise<ApiKeyConfig | null> {
   let apikeyConfig;
   try {
-    apikeyConfig = await redisClient.get(apikey);
+    if (!redisGet) {
+      throw new Error('[redis]: Client is not created');
+    }
+
+    apikeyConfig = await redisGet(apikey);
   } catch (err) {
     appLogger.error(`[redis]: Cannot get config of apikey [${apikey}]`, err);
-    return false;
+    return null;
   }
   try {
-    apikeyConfig = JSON.parse(apikeyConfig)
+    apikeyConfig = JSON.parse(apikeyConfig);
   } catch (err) {
     appLogger.error(`[redis]: Cannot parse to json [${apikeyConfig}]`, err);
-    return false;
+    return null;
   }
 
   return apikeyConfig;
@@ -97,64 +120,84 @@ export async function get(apikey) {
 
 /**
  * Get all apiKeys with their config
- * @returns {Promise<boolean>} connected or not
  */
-export async function getAll() {
-  let keys;
+export async function getAll(): Promise<string[] | null> {
+  let keys: string[];
   try {
-    keys = await redisClient.keys('*');
+    if (!redisKeys) {
+      throw new Error('[redis]: Client is not created');
+    }
+
+    keys = await redisKeys('*');
   } catch (err) {
     appLogger.error(`[redis]: Cannot get all keys ${err}`);
-    return false;
+    return null;
   }
 
-  return keys
+  return keys;
 }
 
-function createRandomKey() {
+/**
+ * create random key for new API key.
+ *
+ * @returns random key.
+ */
+function createRandomKey(): string {
   const currentDate = Date.now();
   const random = Math.random().toString();
   return createHash('sha256').update(`${currentDate}${random}`).digest('hex');
 }
 
-export async function create(apikeyConfig) {
+/**
+ * Create new API key.
+ *
+ * @returns new API key and his config.
+ */
+export async function create(apikeyConfig): Promise<ApiKey | null> {
   const {
     name, owner, description, allowed, attributes,
   } = apikeyConfig;
 
-  const keys = await getAll()
+  const keys = await getAll();
 
-  // check if apikey already exist
+  // check if API key already exist
   for (let i = 0; i < keys.length; i += 1) {
-    let apiKeyConfig = await get(keys[i])
+    // eslint-disable-next-line no-await-in-loop
+    const apiKeyConfig: ApiKeyConfig = await get(keys[i]);
 
     if (apiKeyConfig.name === name) {
       throw new Error(`Name [${name}] already exist for a key`);
     }
   }
 
-  let apikey;
-
   const newKey = createRandomKey();
 
   try {
-    apikey = await redisClient.set(newKey, `${JSON.stringify(apikeyConfig)}`);
+    await redisClient.set(newKey, `${JSON.stringify(apikeyConfig)}`);
   } catch (err) {
     appLogger.error(`[redis]: Cannot create apikey with config [${{
       name, attributes, owner, description, allowed,
     }}]`, err);
-    throw new Error(`Cannot create apikey`);
+    throw new Error('Cannot create apikey');
   }
 
-  return { apikey: newKey, config: apikeyConfig }
+  return { apikey: newKey, config: apikeyConfig };
 }
 
+/**
+ * Update config of API key.
+ *
+ * @param apikey API key.
+ * @param apikeyConfig New config of API key.
+ *
+ * @returns New config.
+ */
 export async function update(apikey, apikeyConfig) {
   const {
     name, owner, description, attributes, allowed,
   } = apikeyConfig;
 
-  let config = await get(apikey);
+  const config = await get(apikey);
 
   if (name) config.name = name;
   if (attributes) config.attributes = attributes;
@@ -163,16 +206,25 @@ export async function update(apikey, apikeyConfig) {
   if (typeof allowed === 'boolean') config.allowed = allowed;
 
   try {
-    await redisClient.set(apikey, `${JSON.stringify(config)}`);
+    await redisSet(apikey, `${JSON.stringify(config)}`);
   } catch (err) {
     appLogger.error(`[redis]: Cannot update apikey [${apikey}] for [${name}]`, err);
     throw err;
   }
+
+  return config;
 }
 
+/**
+ * Remove API key.
+ *
+ * @param apikey API key.
+ *
+ * @returns Is removed or not.
+ */
 export async function remove(apikey) {
   try {
-    await redisClient.del(apikey);
+    await redisDel(apikey);
   } catch (err) {
     appLogger.error(`[redis]: Cannot delete apikey [${apikey}]`, err);
     return false;
@@ -180,26 +232,22 @@ export async function remove(apikey) {
   return true;
 }
 
+/**
+ * Load dev API key.
+ */
 export async function loadDev() {
-  let apiKeys = await readFile(resolve(__dirname, '..', '..', 'apikey-dev.json'), 'utf8');
-
-  try {
-    apiKeys = JSON.parse(apiKeys);
-  } catch (err) {
-    appLogger.error()
-    throw err;
-  }
-  
+  const { default: apiKeys } = await import('../../apikey-dev.json');
 
   for (let i = 0; i < apiKeys.length; i += 1) {
     const { apikey } = apiKeys[i];
-    const configApikey = apiKeys[i].config;
+    const configApiKey = apiKeys[i].config as ApiKeyConfig;
 
     try {
-      await redisClient.set(apikey, JSON.stringify(configApikey));
-      appLogger.info(`[redis]: ${configApikey.name} is loaded`);
+      // eslint-disable-next-line no-await-in-loop
+      await redisSet(apikey, JSON.stringify(configApiKey));
+      appLogger.info(`[redis]: ${configApiKey.name} is loaded`);
     } catch (err) {
-      appLogger.error(`[redis]: Cannot load [${apikey}] with config [${JSON.stringify(configApikey)}]`, err);
+      appLogger.error(`[redis]: Cannot load [${apikey}] with config [${JSON.stringify(configApiKey)}]`, err);
       throw err;
     }
   }

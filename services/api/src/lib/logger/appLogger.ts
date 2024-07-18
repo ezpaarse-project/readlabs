@@ -30,7 +30,7 @@ winston.loggers.add('app', {
   ],
 });
 
-export const appLogger = winston.loggers.get('app');
+const appLogger = winston.loggers.get('app');
 appLogger.on('error', (err) => appLogger.error(`[winston] ${err.toString()}`));
 
 export default appLogger;

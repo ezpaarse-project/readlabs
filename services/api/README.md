@@ -11,7 +11,7 @@ To set up this service, you can use environment variables. The config is display
 [app] warn: [config]: Redis apikey has the default value 
 [app] warn: [config]: Elasticsearch password has the default value 
 [app] warn: [config]: Elasticsearch apikey has the default value 
-[app] warn: [config]: Apikey has the default value 
+[app] warn: [config]: ApiKey has the default value 
 [app] info: {
   "nodeEnv": "development",
   "timezone": "Europe/Paris",
@@ -24,8 +24,7 @@ To set up this service, you can use environment variables. The config is display
   "elasticsearch": {
     "nodes": "http://elastic:9200",
     "username": "elastic",
-    "password": "********",
-    "apikey": "********"
+    "password": "********"
   },
   "paths": {
     "log": {
@@ -51,7 +50,6 @@ To set up this service, you can use environment variables. The config is display
 | ELASTICSEARCH_NODES | http://elastic | elastic node separated by a comma |
 | ELASTICSEARCH_USERNAME | elastic | username of elastic super user |
 | ELASTICSEARCH_PASSWORD | changeme | password of elastic super user |
-| ELASTICSEARCH_APIKEY | "" | elastic API key |
 | ADMIN_APIKEY | changeme | admin API key |
 
 ### Cron

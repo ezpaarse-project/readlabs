@@ -1,28 +1,33 @@
-import type { FastifyPluginAsync } from 'fastify';
+import type { FastifyPluginAsync, FastifyReply, FastifyRequest } from 'fastify';
 
-import { all } from '~/plugins/all';
+import all from '~/plugins/all';
 
-import { healthcheckLogger } from '~/lib/logger/healthcheck';
+import healthcheckLogger from '~/lib/logger/healthcheck';
 
 const router: FastifyPluginAsync = async (fastify) => {
+  /**
+   * Route use for healthcheck.
+   */
   fastify.route({
     method: 'GET',
     url: '/healthcheck',
     schema: {},
-    preHandler: (request, reply, done) => {
-      // healthcheck logger
-      healthcheckLogger.info({
-        method: request.method,
-        url: request.url,
-        headers: request.headers,
-        query: request.query,
-        params: request.params,
-        body: request.body
-      });
-      done();
-    },
-    handler: (request, reply) => {
-      reply.code(204)
+    preHandler: [
+      all,
+      (request: FastifyRequest, reply: FastifyReply, done: (err?: Error) => void) => {
+        // healthcheck logger
+        healthcheckLogger.info({
+          method: request.method,
+          url: request.url,
+          headers: request.headers,
+          query: request.query,
+          params: request.params,
+          body: request.body,
+        });
+        done();
+      }],
+    handler: (request: FastifyRequest, reply: FastifyReply): void => {
+      reply.code(204);
     },
   });
 };

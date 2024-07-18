@@ -16,7 +16,7 @@ Readlabs is a service that centralizes and makes available metadata from CNRS la
 
 ## Description
 
-Data updates are performed manually via Inist-CNRS internal scripts. Data is stored in an elastic index. To access this data, ezunpaywall offers a RESTful API accessible via an API key.
+Data updates are performed manually via Inist-CNRS internal scripts. Data is stored in an elastic index. To access this data, readlabs offers a RESTful API accessible via an API key.
 
 For application administrators, it's possible to manage these keys via the API and a web interface (coming soon).
 
@@ -29,7 +29,7 @@ Each service :
 
 ## Network-flow
 
-ezunpaywall is made up of several services which are distributed in several docker containers.
+readlabs is made up of several services which are distributed in several docker containers.
 ![Network-flow](./docs/network-flow.png)
 
 ## Installation
@@ -41,7 +41,7 @@ git clone https://github.com/ezpaarse-project/readlabs
 
 #### Prerequisites
 
-The tools you need to let ezunpaywall run are :
+The tools you need to let readlabs run are :
 * docker
 * npm
 
@@ -57,13 +57,13 @@ docker-compose -f docker-compose.debug.yml run --rm elastic chown -R elasticsear
 #### Start
 
 ```bash
-# Start ezunpaywall as daemon
+# Start readlabs as daemon
 docker-compose -f docker-compose.debug.yml up -d
 
-# Stop ezunpaywall
+# Stop readlabs
 docker-compose -f docker-compose.debug.yml stop
 
-# Get the status of ezunpaywall services
+# Get the status of readlabs services
 docker-compose -f docker-compose.debug.yml ps
 ```
 #### Tests
@@ -99,19 +99,15 @@ sysctl -p
 ```
 ### Start/Stop/Status
 
-Before you start ezunpaywall, make sure all necessary environment variables are set.
+Before you start readlabs, make sure all necessary environment variables are set.
 
 ```bash
-# Start ezunpaywall as daemon
+# Start readlabs as daemon
 docker-compose up -d
 
-# Stop ezunpaywall
+# Stop readlabs
 docker-compose stop
 
-# Get the status of ezunpaywall services
+# Get the status of readlabs services
 docker-compose ps
 
-## Data update 
-
-You can update your data via update snapshots provided by unpaywall on a weekly or daily basis (if you have API key).
-in the update service, there is a cron that allows to automatically update the data from unpaywall, weekly or daily.

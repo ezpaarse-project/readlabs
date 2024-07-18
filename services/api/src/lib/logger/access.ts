@@ -2,18 +2,25 @@ import winston from 'winston';
 
 import { paths } from 'config';
 
-const apacheFormat = winston.format.printf(({ timestamp, level, message }) => {
-  const { method, url, statusCode, contentLength, userAgent, apiKeyName } = message;
-  return `${timestamp} ${method} ${url} ${statusCode} ${contentLength} ${userAgent} ${apiKeyName}`;
+const apacheFormat = winston.format.printf((info: winston.Logform.TransformableInfo) => {
+  const {
+    method,
+    url,
+    statusCode,
+    contentLength,
+    userAgent,
+    apiKeyName,
+  } = info.message;
+  return `${info.timestamp} ${method} ${url} ${statusCode} ${contentLength} ${userAgent} ${apiKeyName}`;
 });
- 
-export const accessLogger = winston.createLogger({
+
+export default winston.createLogger({
   level: 'info',
   format: winston.format.combine(
     winston.format.timestamp(),
-    apacheFormat
+    apacheFormat,
   ),
   transports: [
-    new winston.transports.File({ filename: `${paths.log.accessDir}/access.log` })
-  ]
+    new winston.transports.File({ filename: `${paths.log.accessDir}/access.log` }),
+  ],
 });

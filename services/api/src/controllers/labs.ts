@@ -1,11 +1,23 @@
-import { search } from '~/lib/elastic'
+import type { FastifyReply, FastifyRequest } from 'fastify';
+
+import { search } from '~/lib/elastic';
 
 /**
- * 
- * @param request 
+ * Controller to request elastic to get labs data.
+ * The ids of labs is sent by the body.
+ * The attributes requested is sent by the data.
+ *
+ * @param request
  * @param reply
  */
-export async function getLabsController(request, reply) {
+export default async function getLabsController(
+  request: FastifyRequest<{
+    Body: {
+      ids: string[]
+    }
+  }>,
+  reply: FastifyReply,
+): Promise<void> {
   const { ids } = request.body;
   const { attributes } = request.data;
 
@@ -13,17 +25,17 @@ export async function getLabsController(request, reply) {
     query: {
       bool: {
         filter: [
-          { 
-            terms: { 
-              codeUnite: ids 
-            } 
+          {
+            terms: {
+              codeUnite: ids,
+            },
           },
         ],
       },
     },
     _source: attributes,
   };
-  
-  const labs =  await search('int_cnrs-unites', 10, body);
-  reply.code(200).send(labs)
+
+  const labs = await search('int_cnrs-unites', ids.length, body);
+  reply.code(200).send(labs);
 }

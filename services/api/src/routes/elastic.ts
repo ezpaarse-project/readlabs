@@ -1,17 +1,35 @@
 import type { FastifyPluginAsync } from 'fastify';
 
-import { ping as pingElastic } from '~/lib/elastic';
-import { all } from '~/plugins/all';
+import {
+  pingElasticController,
+  startConnectionElasticController,
+} from '~/controllers/elastic';
+
+import admin from '~/plugins/admin';
+import all from '~/plugins/all';
 
 const router: FastifyPluginAsync = async (fastify) => {
+  /**
+   * Route to ping elastic.
+   */
   fastify.route({
     method: 'GET',
     url: '/ping',
     schema: {},
     preHandler: all,
-    handler: async (request) => {
-      await pingElastic();
-    },
+    handler: pingElasticController,
+  });
+
+  /**
+   * Route to connect elastic client to elastic.
+   * Admin only.
+   */
+  fastify.route({
+    method: 'GET',
+    url: '/connect',
+    schema: {},
+    preHandler: admin,
+    handler: startConnectionElasticController,
   });
 };
 

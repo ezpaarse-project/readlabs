@@ -1,11 +1,11 @@
 import type { FastifyPluginAsync } from 'fastify';
-import { admin } from '~/plugins/admin';
-import { all } from '~/plugins/all';
+import admin from '~/plugins/admin';
+import all from '~/plugins/all';
 
-import { 
-  ping as pingRedis,
-  startConnection as startConnectionRedis 
-} from '~/lib/redis';
+import {
+  pingRedisController,
+  startConnectionRedisController,
+} from '~/controllers/redis';
 
 const router: FastifyPluginAsync = async (fastify) => {
   fastify.route({
@@ -13,10 +13,7 @@ const router: FastifyPluginAsync = async (fastify) => {
     url: '/ping',
     schema: {},
     preHandler: all,
-    handler: async (request) => {
-      const ping = await pingRedis();
-      return ping;
-    },
+    handler: pingRedisController,
   });
 
   fastify.route({
@@ -24,10 +21,7 @@ const router: FastifyPluginAsync = async (fastify) => {
     url: '/connect',
     schema: {},
     preHandler: admin,
-    handler: async (request) => {
-      await startConnectionRedis();
-      return null
-    },
+    handler: startConnectionRedisController,
   });
 };
 

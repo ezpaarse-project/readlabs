@@ -1,39 +1,47 @@
-import config from 'config';
+import nodeConfig from 'config';
 
-import { appLogger } from '~/lib/logger/appLogger';
+import appLogger from '~/lib/logger/appLogger';
 
 import defaultConfig from '~/../config/default.json';
 
-const copyConfig = JSON.parse(JSON.stringify(config));
+type Config = typeof defaultConfig;
+
+export const config = nodeConfig as unknown as Config;
+
+const appConfig: Config = JSON.parse(JSON.stringify(config));
 
 /**
- * Get config of service.
+ * Hides sensitive value on config.
  *
- * @returns {Object} Config of service.
+ * @param conf App config.
+ *
+ * @returns Config with hidden sensitive values.
  */
-export function getConfig() {
-  if (copyConfig.redis.apikey === defaultConfig.redis.apikey) {
-    appLogger.warn('[config]: Redis apikey has the default value');
+function hideSecret(conf: Config) {
+  const copyConfig = { ...conf };
+  copyConfig.redis.password = '********';
+  copyConfig.elasticsearch.password = '********';
+  copyConfig.apikey = '********';
+  return copyConfig;
+}
+
+/**
+ * Log config on stdout.
+ */
+export function logConfig() {
+  if (appConfig.redis.password === defaultConfig.redis.password) {
+    appLogger.warn('[config]: Redis password has the default value');
   }
 
-  if (copyConfig.elasticsearch.password === defaultConfig.elasticsearch.password) {
+  if (appConfig.elasticsearch.password === defaultConfig.elasticsearch.password) {
     appLogger.warn('[config]: Elasticsearch password has the default value');
   }
 
-  if (copyConfig.elasticsearch.apikey === defaultConfig.elasticsearch.apikey) {
-    appLogger.warn('[config]: Elasticsearch apikey has the default value');
+  if (appConfig.apikey === defaultConfig.apikey) {
+    appLogger.warn('[config]: ApiKey has the default value');
   }
 
-  if (copyConfig.apikey === defaultConfig.apikey) {
-    appLogger.warn('[config]: Apikey has the default value');
-  }
+  const appConfigFiltered = hideSecret(appConfig);
 
-  copyConfig.redis.apikey = '********';
-  copyConfig.elasticsearch.apikey = '********';
-  copyConfig.elasticsearch.password = '********';
-  copyConfig.apikey = '********';
-
-  appLogger.info(JSON.stringify(copyConfig, null, 2));
-
-  return copyConfig;
+  appLogger.info(JSON.stringify(appConfigFiltered, null, 2));
 }

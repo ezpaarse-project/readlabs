@@ -1,6 +1,6 @@
-import type { FastifyPluginAsync } from 'fastify';
+import type { FastifyPluginAsync, FastifyReply, FastifyRequest } from 'fastify';
 
-import { all } from '~/plugins/all';
+import all from '~/plugins/all';
 
 const router: FastifyPluginAsync = async (fastify) => {
   fastify.route({
@@ -8,8 +8,8 @@ const router: FastifyPluginAsync = async (fastify) => {
     url: '/',
     schema: {},
     preHandler: all,
-    handler: (request, reply) => {
-      reply.code(200).send('api service')
+    handler: async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
+      reply.code(200).send('api service');
     },
   });
 
@@ -18,8 +18,8 @@ const router: FastifyPluginAsync = async (fastify) => {
     url: '/ping',
     schema: {},
     preHandler: all,
-    handler: (request, reply) => {
-      reply.code(204)
+    handler: async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
+      reply.code(204);
     },
   });
 };

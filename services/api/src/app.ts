@@ -1,28 +1,25 @@
-import Fastify from 'fastify'
+import Fastify from 'fastify';
+import type { FastifyRequest, FastifyReply } from 'fastify';
 import { mkdir } from 'fs/promises';
 import { resolve } from 'path';
 
-import { paths } from 'config';
+import appLogger from '~/lib/logger/appLogger';
+import accessLogger from '~/lib/logger/access';
 
-import { appLogger } from '~/lib/logger/appLogger';
-import { accessLogger } from '~/lib/logger/access';
-
-import { 
+import {
   initClient as initClientElastic,
-  ping as pingElastic
- } from '~/lib/elastic';
-import { 
-  initClient as initClientRedis, 
-  ping as pingRedis, 
-  startConnection as startConnectionRedis 
+  ping as pingElastic,
+} from '~/lib/elastic';
+import {
+  initClient as initClientRedis,
+  ping as pingRedis,
+  startConnection as startConnectionRedis,
+  get as getApiKey,
 } from '~/lib/redis';
 
+import { logConfig, config } from '~/lib/config';
 
-import { get as getApikey } from '~/lib/redis'
-
-import { getConfig } from '~/lib/config'
-
-import { ajv } from '~/lib/ajv';
+import ajv from '~/lib/ajv';
 
 import healthcheckRouter from '~/routes/healthcheck';
 import pingRouter from '~/routes/ping';
@@ -31,6 +28,7 @@ import apiKeysRouter from '~/routes/apikey';
 import elasticRouter from '~/routes/elastic';
 import redisRouter from '~/routes/redis';
 
+const { paths } = config;
 
 const start = async () => {
   // create log directory
@@ -38,25 +36,27 @@ const start = async () => {
   await mkdir(resolve(paths.log.accessDir), { recursive: true });
   await mkdir(resolve(paths.log.healthCheckDir), { recursive: true });
 
-  const fastify = Fastify()
+  const fastify = Fastify();
 
-  fastify.setValidatorCompiler(({ schema }) => {
-    return ajv.compile(schema);
-  });
-
-  await fastify.register(healthcheckRouter, { prefix: '/' });
+  fastify.setValidatorCompiler(({ schema }) => ajv.compile(schema));
 
   // access logger
-  fastify.addHook('onRequest', async (request, reply) => {
+  fastify.addHook('onResponse', async (
+    request: FastifyRequest,
+    reply: FastifyReply,
+  ):Promise<void> => {
     if (request.url === '/healthcheck') {
       return;
     }
 
-    let apiKeyName = '-'
+    let apiKeyName = '-';
 
     if (request.headers['x-api-key']) {
-      const apiKeyConfig = await getApikey(request.headers['x-api-key']);
-      apiKeyName = apiKeyConfig.name;
+      const apiKey = Array.isArray(request.headers['x-api-key']) ? request.headers['x-api-key'][0] : request.headers['x-api-key'];
+      const apiKeyConfig = await getApiKey(apiKey);
+      if (apiKeyConfig) {
+        apiKeyName = apiKeyConfig.name;
+      }
     }
 
     accessLogger.info({
@@ -69,6 +69,7 @@ const start = async () => {
     });
   });
 
+  await fastify.register(healthcheckRouter, { prefix: '/' });
   await fastify.register(pingRouter, { prefix: '/' });
   await fastify.register(labsRouter, { prefix: '/labs' });
   await fastify.register(apiKeysRouter, { prefix: '/apikeys' });
@@ -76,19 +77,18 @@ const start = async () => {
   await fastify.register(redisRouter, { prefix: '/redis' });
 
   const address = await fastify.listen({ port: 3000, host: '::' });
-  appLogger.info(`[fastify]: listening at ${address}`)
+  appLogger.info(`[fastify]: listening at ${address}`);
 
   // show config
-  getConfig();
+  logConfig();
 
   // ping
-  initClientElastic()
+  initClientElastic();
   await pingElastic();
 
-  initClientRedis()
+  initClientRedis();
   await startConnectionRedis();
   await pingRedis();
-  
 };
 
 start();

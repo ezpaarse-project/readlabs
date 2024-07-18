@@ -1,36 +1,59 @@
-import { get } from '~/lib/redis'
+import type { FastifyReply, FastifyRequest } from 'fastify';
+import type { ApiKeyConfig } from '~/models/apikey';
 
-import { appLogger } from '~/lib/logger/appLogger';
+import { get } from '~/lib/redis';
 
-import allowedAttributes from '~/../mapping/labs.attributes.json'
+import appLogger from '~/lib/logger/appLogger';
 
-async function getConfigApiKey(key) {
-  let apikeyConfig;
+interface FastifyRequestApiKey extends FastifyRequest {
+  query: { apikey: string };
+  headers: { 'x-api-key': string };
+  body: {
+    attributes?: string[];
+  }
+}
+
+/**
+ * Get config of API key.
+ *
+ * @param key apikey.
+ * @returns Config of API key.
+ */
+async function getConfigApiKey(key: string): Promise<ApiKeyConfig | null> {
+  let apikeyConfig: ApiKeyConfig;
   try {
-    apikeyConfig = await get(key)
+    apikeyConfig = await get(key);
   } catch (err) {
-    appLogger.error(`[redis]: Cannot get config of [${key}]`)
+    appLogger.error(`[redis]: Cannot get config of [${key}]`);
   }
 
   if (!apikeyConfig) {
-    return {};
+    return null;
   }
 
   return apikeyConfig;
 }
-
-export async function user(request, reply) {
+/**
+ * Route middleware for user.
+ *
+ * @param request
+ * @param reply
+ */
+export async function user(
+  request: FastifyRequestApiKey,
+  reply: FastifyReply,
+): Promise<void> {
   const keyFromHeaders = request.headers['x-api-key'];
-  const keyFromQuery = request.query['apikey'];
+  const keyFromQuery = request.query.apikey;
 
   if (keyFromHeaders && keyFromQuery && keyFromHeaders !== keyFromQuery) {
     reply.code(418);
   }
 
-  let key;
+  let key: string;
 
   if (keyFromHeaders || keyFromQuery) {
-    key = keyFromHeaders ? keyFromHeaders : keyFromQuery
+    key = keyFromHeaders || keyFromQuery;
   }
 
   if (!key) {
@@ -38,35 +61,48 @@ export async function user(request, reply) {
     return;
   }
 
-  const apikeyConfig = await getConfigApiKey(key);
+  const apikeyConfig: ApiKeyConfig = await getConfigApiKey(key);
 
   if (!apikeyConfig) {
     reply.code(403).send({ error: 'Invalid API key' });
     return;
   }
 
-  if (!request.data) {
-    request.data = {};
-  }
-
-
   request.data.apiKeyConfig = apikeyConfig;
 }
 
-export async function checkApikeyConfig(request, reply) {
+/**
+ * Middleware that checks whether users have rights to the attributes they request.
+ *
+ * @param request
+ * @param reply
+ */
+export async function checkApiKeyConfig(
+  request: FastifyRequest<{
+    Querystring: {
+      apikey: string
+    },
+    Body: {
+      attributes: string[]
+    }
+    data: {
+      attributes: string[]
+    }
+  }>,
+  reply: FastifyReply,
+): Promise<void> {
   let requestedAttributes = request.body.attributes;
-  const { apiKeyConfig } = request.data
+  const { apiKeyConfig } = request.data;
 
   request.data.attributes = requestedAttributes;
 
-  if (apiKeyConfig.attributes === ['*']) {
+  if (apiKeyConfig.attributes.every((attr) => attr === '*')) {
     return;
   }
-  
 
   if (!requestedAttributes) {
     requestedAttributes = apiKeyConfig.attributes;
-    request.data.attributes = apiKeyConfig.attributes
+    request.data.attributes = apiKeyConfig.attributes;
   }
 
   requestedAttributes.forEach((field) => {

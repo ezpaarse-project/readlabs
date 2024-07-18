@@ -1,6 +1,17 @@
+import type { FastifyReply, FastifyRequest } from 'fastify';
+
 import { apikey } from 'config';
 
-export async function admin(request, reply, done) {
+/**
+ * Route middleware for administrators only
+ *
+ * @param request
+ * @param reply
+ */
+export default async function admin(
+  request: FastifyRequest,
+  reply: FastifyReply,
+): Promise<void> {
   const key = request.headers['x-api-key'];
 
   if (!key) {
@@ -10,6 +21,5 @@ export async function admin(request, reply, done) {
 
   if (key !== apikey) {
     reply.code(403).send({ error: 'Invalid API key' });
-    return;
   }
 }
