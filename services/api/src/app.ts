@@ -1,4 +1,5 @@
 import Fastify from 'fastify';
+import fastifyCors from '@fastify/cors';
 import type { FastifyRequest, FastifyReply } from 'fastify';
 import { mkdir } from 'fs/promises';
 import { resolve } from 'path';
@@ -24,9 +25,13 @@ import ajv from '~/lib/ajv';
 import healthcheckRouter from '~/routes/healthcheck';
 import pingRouter from '~/routes/ping';
 import labsRouter from '~/routes/labs';
+import adminRouter from '~/routes/admin';
+import configRouter from '~/routes/config';
 import apiKeysRouter from '~/routes/apikey';
 import elasticRouter from '~/routes/elastic';
 import redisRouter from '~/routes/redis';
+
+import cleanLogFileCron from '~/cron/cleanLogFile';
 
 const { paths } = config;
 
@@ -38,7 +43,25 @@ const start = async () => {
 
   const fastify = Fastify();
 
+  // Register cors
+  await fastify.register(
+    fastifyCors,
+    { origin: '*' },
+  );
+
   fastify.setValidatorCompiler(({ schema }) => ajv.compile(schema));
+
+  // Measure response time
+  fastify.addHook('onRequest', (request, reply, done) => {
+    request.startTime = Date.now();
+    done();
+  });
+
+  fastify.addHook('onResponse', (request, reply, done) => {
+    request.endTime = Date.now();
+    request.time = request.endTime - request.startTime;
+    done();
+  });
 
   // access logger
   fastify.addHook('onResponse', async (
@@ -71,13 +94,15 @@ const start = async () => {
 
   await fastify.register(healthcheckRouter, { prefix: '/' });
   await fastify.register(pingRouter, { prefix: '/' });
+  await fastify.register(adminRouter, { prefix: '/login' });
+  await fastify.register(configRouter, { prefix: '/config' });
   await fastify.register(labsRouter, { prefix: '/labs' });
   await fastify.register(apiKeysRouter, { prefix: '/apikeys' });
   await fastify.register(elasticRouter, { prefix: '/elastic' });
   await fastify.register(redisRouter, { prefix: '/redis' });
 
   const address = await fastify.listen({ port: 3000, host: '::' });
-  appLogger.info(`[fastify]: listening at ${address}`);
+  appLogger.info(`[fastify]: listening at [${address}]`);
 
   // show config
   logConfig();
@@ -89,6 +114,10 @@ const start = async () => {
   initClientRedis();
   await startConnectionRedis();
   await pingRedis();
+
+  if (cleanLogFileCron.active) {
+    cleanLogFileCron.start();
+  }
 };
 
 start();

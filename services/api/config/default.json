@@ -9,7 +9,17 @@
   "elasticsearch": {
     "nodes": "http://elastic:9200",
     "username": "elastic",
-    "password": "changeme"
+    "password": "changeme",
+    "indexBase": "int_cnrs-unites"
+  },
+  "cron": {
+    "cleanLog": {
+      "schedule": "0 0 0 * * *",
+      "active": true,
+      "applicationLogThreshold": 150,
+      "accessLogThreshold": 30,
+      "healthcheckLogThreshold": 30
+    }
   },
   "paths": {
     "log": {
@@ -18,6 +28,5 @@
       "healthCheckDir": "./log/healthcheck"
     }
   },
-  "index": "int_cnrs-unites",
   "apikey": "changeme"
 }

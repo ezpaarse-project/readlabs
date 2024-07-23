@@ -16,7 +16,8 @@ export async function pingElasticController(
   reply: FastifyReply,
 ): Promise<void> {
   await pingElastic();
-  reply.code(200).send({ message: 'Pong' });
+  const endTime = Date.now();
+  reply.code(200).send({ message: 'Pong', elapsedTime: endTime - request.startTime });
 }
 
 /**
@@ -26,7 +27,7 @@ export async function pingElasticController(
  * @param reply
  */
 export async function startConnectionElasticController(
-  request: FastifyRequest,
+  _request: FastifyRequest,
   reply: FastifyReply,
 ): Promise<void> {
   await initElasticClient();

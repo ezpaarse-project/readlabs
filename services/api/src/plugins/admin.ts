@@ -3,7 +3,7 @@ import type { FastifyReply, FastifyRequest } from 'fastify';
 import { apikey } from 'config';
 
 /**
- * Route middleware for administrators only
+ * Middleware for administrators only
  *
  * @param request
  * @param reply

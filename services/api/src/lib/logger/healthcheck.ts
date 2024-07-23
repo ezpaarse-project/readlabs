@@ -1,4 +1,5 @@
 import winston from 'winston';
+import DailyRotateFile from 'winston-daily-rotate-file';
 
 import { paths } from 'config';
 
@@ -9,6 +10,9 @@ export default winston.createLogger({
     winston.format.json(),
   ),
   transports: [
-    new winston.transports.File({ filename: `${paths.log.healthCheckDir}/healthcheck.log` }),
+    new DailyRotateFile({
+      filename: `${paths.log.accessDir}/%DATE%-access.log`,
+      datePattern: 'YYYY-MM-DD',
+    }),
   ],
 });

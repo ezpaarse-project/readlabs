@@ -1,4 +1,5 @@
 import winston from 'winston';
+import DailyRotateFile from 'winston-daily-rotate-file';
 import { paths } from 'config';
 
 const formatter = (info: winston.Logform.TransformableInfo) => `${info.timestamp}${info.label ? ` [${info.label}]` : ''} ${info.level}: ${info.message} ${(info instanceof Error ? `\n\n${info.stack}\n` : '')}`;
@@ -23,9 +24,9 @@ winston.loggers.add('app', {
         winston.format.printf(formatter),
       ),
     }),
-    new winston.transports.File({
-      dirname: paths.log.applicationDir,
-      filename: 'app.log',
+    new DailyRotateFile({
+      filename: `${paths.log.accessDir}/%DATE%-application.log`,
+      datePattern: 'YYYY-MM-DD',
     }),
   ],
 });

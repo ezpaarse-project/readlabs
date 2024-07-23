@@ -3,17 +3,23 @@ import type { FastifyRequest, FastifyReply } from 'fastify';
 import type { ApiKey, ApiKeyConfig } from '~/models/apikey';
 
 import {
-  check, get, getAll, create, update, remove, loadDev,
+  check,
+  get,
+  getAll,
+  create,
+  update,
+  remove,
+  loadDev,
 } from '~/lib/redis';
 
 /**
  * Controller to get all keys of API key.
  *
- * @param request
+ * @param _request
  * @param reply
  */
 export async function getAllController(
-  request: FastifyRequest,
+  _request: FastifyRequest,
   reply: FastifyReply,
 ):Promise<void> {
   const apiKeys = await getAll();
@@ -28,10 +34,14 @@ export async function getAllController(
  * @param reply
  */
 export async function getApiKeyConfigController(
-  request: FastifyRequest,
+  request: FastifyRequest<{
+    Params: {
+      apikey: string
+    }
+  }>,
   reply: FastifyReply,
 ): Promise<void> {
-  const { apikey } = request.params as { apikey: string };
+  const { apikey } = request.params;
   const apikeyConfig: ApiKeyConfig = await get(apikey);
   reply.code(200).send(apikeyConfig);
 }
@@ -70,7 +80,7 @@ export async function updateApiKeyController(
   }>,
   reply: FastifyReply,
 ): Promise<void> {
-  const { apikey } = request.params as { apikey: string };
+  const { apikey } = request.params;
   const apikeyConfig: ApiKeyConfig = request.body;
   const apiKeys: ApiKeyConfig = await update(apikey, apikeyConfig);
   reply.code(200).send(apiKeys);
@@ -104,11 +114,11 @@ export async function removeApiKeyController(
 /**
  * Controller to load dev API keys.
  *
- * @param request
+ * @param _request
  * @param reply
  */
 export async function loadDevController(
-  request: FastifyRequest,
+  _request: FastifyRequest,
   reply: FastifyReply,
 ): Promise<void> {
   await loadDev();

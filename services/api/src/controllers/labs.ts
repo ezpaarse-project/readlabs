@@ -1,4 +1,6 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
+import type { estypes as ES } from '@elastic/elasticsearch';
+import { elasticsearch } from 'config';
 
 import { search } from '~/lib/elastic';
 
@@ -25,7 +27,7 @@ export default async function getLabsController(
   const { ids } = request.body;
   const { attributes } = request.data;
 
-  const body = {
+  const body: ES.SearchRequest['body'] = {
     query: {
       bool: {
         filter: [
@@ -40,6 +42,6 @@ export default async function getLabsController(
     _source: attributes,
   };
 
-  const labs = await search('int_cnrs-unites', ids.length, body);
+  const labs = await search(elasticsearch.indexBase, ids.length, body);
   reply.code(200).send(labs);
 }

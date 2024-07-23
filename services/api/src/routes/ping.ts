@@ -19,7 +19,8 @@ const router: FastifyPluginAsync = async (fastify) => {
     schema: {},
     preHandler: all,
     handler: async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
-      reply.code(204);
+      const endTime = Date.now();
+      reply.code(200).send({ message: 'Pong', elapsedTime: endTime - request.startTime });
     },
   });
 };

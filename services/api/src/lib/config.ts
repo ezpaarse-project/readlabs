@@ -17,7 +17,7 @@ const appConfig: Config = JSON.parse(JSON.stringify(config));
  *
  * @returns Config with hidden sensitive values.
  */
-function hideSecret(conf: Config) {
+function hideSecret(conf: Config): Config {
   const copyConfig = { ...conf };
   copyConfig.redis.password = '********';
   copyConfig.elasticsearch.password = '********';
@@ -28,7 +28,7 @@ function hideSecret(conf: Config) {
 /**
  * Log config on stdout.
  */
-export function logConfig() {
+export function logConfig(): void {
   if (appConfig.redis.password === defaultConfig.redis.password) {
     appLogger.warn('[config]: Redis password has the default value');
   }
@@ -44,4 +44,13 @@ export function logConfig() {
   const appConfigFiltered = hideSecret(appConfig);
 
   appLogger.info(JSON.stringify(appConfigFiltered, null, 2));
+}
+
+/**
+ * Get config without secret
+ *
+ * @returns Config without secret
+ */
+export function getConfig(): Config {
+  return hideSecret(appConfig);
 }

@@ -9,5 +9,8 @@ declare module 'fastify' {
       };
       attributes?: string[];
     };
+    startTime: number
+    endTime: number
+    time: number
   }
 }

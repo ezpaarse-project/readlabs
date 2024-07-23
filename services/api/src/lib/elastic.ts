@@ -1,9 +1,15 @@
-import { Client, type ClientOptions } from '@elastic/elasticsearch';
+import {
+  Client,
+  type ClientOptions,
+  type estypes as ES,
+  type ApiResponse,
+} from '@elastic/elasticsearch';
 
 import { resolve } from 'path';
 import { readFileSync } from 'fs';
 
 import { nodeEnv, elasticsearch } from 'config';
+import type Lab from '~/models/lab';
 
 import appLogger from '~/lib/logger/appLogger';
 
@@ -54,7 +60,7 @@ export async function initClient(): Promise<void> {
  * @returns ping
  */
 export async function ping(): Promise<boolean> {
-  let elasticStatus;
+  let elasticStatus: ApiResponse<ES.PingResponse> | undefined;
   try {
     elasticStatus = await elasticClient.ping();
   } catch (err) {
@@ -78,12 +84,12 @@ export async function ping(): Promise<boolean> {
  *
  * @returns Elastic response
  */
-export async function search(indexName: string, size: number, body: Record<string, any>) {
+export async function search(indexName: string, size: number, body: ES.SearchRequest['body']) {
   if (!elasticClient) {
     throw new Error('[elastic]: Elastic client is not initialized');
   }
 
-  let res;
+  let res: ApiResponse<ES.SearchResponse<Lab>> | undefined;
   try {
     res = await elasticClient.search({
       index: indexName,

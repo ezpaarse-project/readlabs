@@ -1,6 +1,6 @@
 import winston from 'winston';
-
-import { paths } from 'config';
+import DailyRotateFile from 'winston-daily-rotate-file';
+import { paths, nodeEnv } from 'config';
 
 const apacheFormat = winston.format.printf((info: winston.Logform.TransformableInfo) => {
   const {
@@ -21,6 +21,10 @@ export default winston.createLogger({
     apacheFormat,
   ),
   transports: [
-    new winston.transports.File({ filename: `${paths.log.accessDir}/access.log` }),
+    nodeEnv === 'development' ? new winston.transports.Console() : null,
+    new DailyRotateFile({
+      filename: `${paths.log.accessDir}/%DATE%-access.log`,
+      datePattern: 'YYYY-MM-DD',
+    }),
   ],
 });

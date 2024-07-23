@@ -16,7 +16,8 @@ export async function pingRedisController(
   reply: FastifyReply,
 ): Promise<void> {
   await pingRedis();
-  reply.code(200).send({ message: 'Pong' });
+  const endTime = Date.now();
+  reply.code(200).send({ message: 'Pong', elapsedTime: endTime - request.startTime });
 }
 
 /**
@@ -26,7 +27,7 @@ export async function pingRedisController(
  * @param reply
  */
 export async function startConnectionRedisController(
-  request: FastifyRequest,
+  _request: FastifyRequest,
   reply: FastifyReply,
 ): Promise<void> {
   await startConnectionRedis();

@@ -1,7 +1,7 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 
 /**
- * Route middleware for everybody.
+ * Middleware for everybody.
  *
  * @param request
  * @param reply

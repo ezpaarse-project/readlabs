@@ -3,7 +3,7 @@ import type { FastifyReply, FastifyRequest } from 'fastify';
 import { nodeEnv } from 'config';
 
 /**
- * Route middleware for everybody.
+ * Middleware for dev.
  *
  * @param request
  * @param reply

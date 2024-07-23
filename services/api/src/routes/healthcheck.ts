@@ -14,7 +14,7 @@ const router: FastifyPluginAsync = async (fastify) => {
     schema: {},
     preHandler: [
       all,
-      (request: FastifyRequest, reply: FastifyReply, done: (err?: Error) => void) => {
+      (request: FastifyRequest, _reply: FastifyReply, done: (err?: Error) => void) => {
         // healthcheck logger
         healthcheckLogger.info({
           method: request.method,
@@ -26,7 +26,7 @@ const router: FastifyPluginAsync = async (fastify) => {
         });
         done();
       }],
-    handler: (request: FastifyRequest, reply: FastifyReply): void => {
+    handler: (_request: FastifyRequest, reply: FastifyReply): void => {
       reply.code(204);
     },
   });

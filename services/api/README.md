@@ -10,7 +10,6 @@ To set up this service, you can use environment variables. The config is display
 # if sensitive data are not updated
 [app] warn: [config]: Redis apikey has the default value 
 [app] warn: [config]: Elasticsearch password has the default value 
-[app] warn: [config]: Elasticsearch apikey has the default value 
 [app] warn: [config]: ApiKey has the default value 
 [app] info: {
   "nodeEnv": "development",

@@ -1,0 +1,98 @@
+{
+  "language": "Language",
+  "menu": {
+    "home": "Home",
+    "administration": "Administration"
+  },
+  "theme": {
+    "dark": "Dark theme",
+    "light": "Light theme"
+  },
+  "administration": {
+    "title": "Administration",
+    "loginForm": "Login form",
+    "login": "Login",
+    "logout": "Logout",
+    "password": "Password",
+    "menu": {
+      "apikey": "API key",
+      "health": "Health",
+      "cron": "Cron",
+      "config": "Config"
+    },
+    "elastic": {
+      "title": "Information about elastic",
+      "noInfo": "No info about elastic",
+      "reload": "Reload elastic info",
+      "documents": "documents"
+    },
+    "health": {
+      "title": "Services status",
+      "reload": "Reload healths",
+      "noHealth": "No service status"
+    },
+    "apikey": {
+      "title": "API keys",
+      "reload": "Reload API keys",
+      "noApikeys": "no API keys",
+      "name": "Name",
+      "ownerValue": "Owner: {owner}",
+      "descriptionValue": "Description: {description}",
+      "owner": "Owner",
+      "description": "Description",
+      "createdAtValue": "Created at: {date}",
+      "createdAt": "Created at:",
+      "attributes": "Attributes:",
+      "allowed": "Allowed",
+      "notAllowed": "Not Allowed",
+      "import": "Import API keys in JSON format",
+      "export": "Export API keys in JSON format",
+      "create": "Create new API key",
+      "update": "Update API key",
+      "delete": "Deleting API key",
+      "deleteMessage": "Are you sure you want to delete this API key: [{apiKey}] ? (irreversible action)"
+    },
+    "config": {
+      "title": "API Config"
+    }
+  },
+  "error": {
+    "apikey": {
+      "import": "Cannot import API keys",
+      "copy": "Cannot copy API keys",
+      "get": "Cannot get API keys",
+      "parse": "Cannot parse the config of API key to JSON",
+      "create": "The API key could not be created",
+      "update": "The API key could not be updated",
+      "delete": "Cannot delete apikey"
+    }
+  },
+  "info" : {
+    "apikey": {
+      "imported": "API keys have been successfully imported",
+      "created": "The API key has been created",
+      "updated": "The API key has been updated",
+      "deleted": "The API key has been deleted",
+      "copied": "API keys have been copied"
+    }
+  },
+  "checkAll": "Check all",
+  "uncheckAll": "Uncheck all",
+  "search": "Search",
+  "edit": "Edit",
+  "delete": "Delete",
+  "download": "Download",
+  "copy": "Copy",
+  "send": "Send",
+  "create": "Create",
+  "createdAt": "Created at",
+  "required": "Required",
+  "cancel": "Cancel",
+  "update": "Update",
+  "close": "Close",
+  "yes": "Yes",
+  "no": "No",
+  "detail": "Detail",
+  "development": "development",
+  "integration": "integration"
+}
