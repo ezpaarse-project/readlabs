@@ -51,6 +51,12 @@ const router: FastifyPluginAsync = async (fastify) => {
     method: 'GET',
     url: '/',
     schema: {},
+    config: {
+      rateLimit: {
+        max: 60,
+        timeWindow: '1 minute',
+      },
+    },
     preHandler: admin,
     handler: getAllController,
   });
@@ -74,6 +80,12 @@ const router: FastifyPluginAsync = async (fastify) => {
     method: 'POST',
     url: '/',
     schema: getSchema(true),
+    config: {
+      rateLimit: {
+        max: 60,
+        timeWindow: '1 minute',
+      },
+    },
     preHandler: admin,
     handler: createApiKeyController,
   });
@@ -86,6 +98,12 @@ const router: FastifyPluginAsync = async (fastify) => {
     method: 'PUT',
     url: '/:apikey',
     schema: getSchema(false),
+    config: {
+      rateLimit: {
+        max: 60,
+        timeWindow: '1 minute',
+      },
+    },
     preHandler: admin,
     handler: updateApiKeyController,
   });
@@ -98,6 +116,12 @@ const router: FastifyPluginAsync = async (fastify) => {
     method: 'DELETE',
     url: '/:apikey',
     schema: {},
+    config: {
+      rateLimit: {
+        max: 60,
+        timeWindow: '1 minute',
+      },
+    },
     preHandler: admin,
     handler: removeApiKeyController,
   });

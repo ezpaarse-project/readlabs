@@ -8,8 +8,8 @@ import type { FastifyReply, FastifyRequest } from 'fastify';
  * @param done
  */
 export default function all(
-  request: FastifyRequest,
-  reply: FastifyReply,
+  _request: FastifyRequest,
+  _reply: FastifyReply,
   done: (err?: Error) => void,
 ): void {
   done();

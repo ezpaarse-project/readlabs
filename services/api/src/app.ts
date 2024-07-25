@@ -18,7 +18,7 @@ import {
   get as getApiKey,
 } from '~/lib/redis';
 
-import { logConfig, config } from '~/lib/config';
+import rateLimiter from '~/plugins/rateLimit';
 
 import ajv from '~/lib/ajv';
 
@@ -32,6 +32,8 @@ import elasticRouter from '~/routes/elastic';
 import redisRouter from '~/routes/redis';
 
 import cleanLogFileCron from '~/cron/cleanLogFile';
+
+import { logConfig, config } from '~/lib/config';
 
 const { paths } = config;
 
@@ -92,6 +94,10 @@ const start = async () => {
     });
   });
 
+  // rate limit
+  await fastify.register(rateLimiter);
+
+  // routes
   await fastify.register(healthcheckRouter, { prefix: '/' });
   await fastify.register(pingRouter, { prefix: '/' });
   await fastify.register(adminRouter, { prefix: '/login' });

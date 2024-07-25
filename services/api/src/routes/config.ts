@@ -8,6 +8,12 @@ const router: FastifyPluginAsync = async (fastify) => {
     method: 'GET',
     url: '/',
     schema: {},
+    config: {
+      rateLimit: {
+        max: 60,
+        timeWindow: '1 minute',
+      },
+    },
     preHandler: admin,
     handler: getConfigController,
   });

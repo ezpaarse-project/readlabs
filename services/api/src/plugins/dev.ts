@@ -9,7 +9,7 @@ import { nodeEnv } from 'config';
  * @param reply
  */
 export default async function dev(
-  request: FastifyRequest,
+  _request: FastifyRequest,
   reply: FastifyReply,
 ): Promise<void> {
   if (nodeEnv !== 'development') {
