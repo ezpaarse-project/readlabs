@@ -4,14 +4,15 @@ import { paths, nodeEnv } from 'config';
 
 const apacheFormat = winston.format.printf((info: winston.Logform.TransformableInfo) => {
   const {
+    apiKeyName,
     method,
     url,
     statusCode,
     contentLength,
     userAgent,
-    apiKeyName,
+    responseTime,
   } = info.message;
-  return `${info.timestamp} ${method} ${url} ${statusCode} ${contentLength} ${userAgent} ${apiKeyName}`;
+  return `${info.timestamp} ${apiKeyName} ${method} ${url} ${statusCode} ${contentLength} ${userAgent} ${responseTime}ms`;
 });
 
 export default winston.createLogger({

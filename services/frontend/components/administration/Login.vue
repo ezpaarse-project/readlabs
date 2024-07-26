@@ -60,7 +60,7 @@ async function tryLogin() {
 
   try {
     await $fetch('/login', {
-      method: 'GET',
+      method: 'POST',
       headers: {
         'x-api-key': password.value
       }

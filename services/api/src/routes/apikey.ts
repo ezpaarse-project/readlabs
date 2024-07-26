@@ -14,7 +14,7 @@ import {
 } from '~/controllers/apikey';
 
 /**
- * schema for create or update API key.
+ * Schema for create or update API key.
  *
  * @param isCreate create or update.
  *

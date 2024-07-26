@@ -107,7 +107,7 @@ export async function removeApiKeyController(
     reply.code(404).send();
   } else {
     await remove(apikey);
-    reply.code(202).send();
+    reply.code(204).send();
   }
 }
 
@@ -122,5 +122,5 @@ export async function loadDevController(
   reply: FastifyReply,
 ): Promise<void> {
   await loadDev();
-  reply.code(202).send();
+  reply.code(204).send();
 }

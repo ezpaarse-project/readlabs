@@ -14,15 +14,16 @@ const router: FastifyPluginAsync = async (fastify) => {
     schema: {},
     preHandler: [
       all,
-      (request: FastifyRequest, _reply: FastifyReply, done: (err?: Error) => void) => {
+      (request: FastifyRequest, reply: FastifyReply, done: (err?: Error) => void) => {
         // healthcheck logger
         healthcheckLogger.info({
           method: request.method,
           url: request.url,
-          headers: request.headers,
-          query: request.query,
-          params: request.params,
-          body: request.body,
+          statusCode: reply.statusCode,
+          contentLength: reply.getHeader('content-length') || 0,
+          userAgent: request.headers['user-agent'] || '-',
+          apiKeyName: '-',
+          responseTime: Date.now() - request.startTime,
         });
         done();
       }],

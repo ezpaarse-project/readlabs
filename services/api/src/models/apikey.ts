@@ -4,6 +4,7 @@ export interface ApiKeyConfig {
   description: string,
   attributes: string[],
   allowed: boolean
+  createdAt?: string
 }
 
 export interface ApiKey {

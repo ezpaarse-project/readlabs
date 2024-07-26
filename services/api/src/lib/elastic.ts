@@ -60,17 +60,24 @@ export async function initClient(): Promise<void> {
  * @returns ping
  */
 export async function ping(): Promise<boolean> {
+  if (!elasticClient) {
+    throw new Error('[elastic]: Elastic client is not initialized');
+  }
+
   let elasticStatus: ApiResponse<ES.PingResponse> | undefined;
+
   try {
     elasticStatus = await elasticClient.ping();
   } catch (err) {
     appLogger.error(`[elastic]: Cannot ping ${elasticsearch.nodes.split(',')}`, err);
     return false;
   }
+
   if (elasticStatus?.statusCode !== 200) {
     appLogger.error(`[elastic]: Cannot ping ${elasticsearch.nodes.split(',')} - ${elasticStatus?.statusCode}`);
     return false;
   }
+
   appLogger.info(`[elastic]: Success ping to ${elasticsearch.nodes.split(',')}`);
   return true;
 }

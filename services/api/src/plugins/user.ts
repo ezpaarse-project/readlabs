@@ -43,18 +43,14 @@ export async function user(
   }>,
   reply: FastifyReply,
 ): Promise<void> {
-  const keyFromHeaders = Array.isArray(request.headers['x-api-key']) ? request.headers['x-api-key'][0] : request.headers['x-api-key'];
-  const keyFromQuery = request.query.apikey;
+  const keyFromHeaders: string = Array.isArray(request.headers['x-api-key']) ? request.headers['x-api-key'][0] : request.headers['x-api-key'];
+  const keyFromQuery: string = request.query.apikey;
 
   if (keyFromHeaders && keyFromQuery && keyFromHeaders !== keyFromQuery) {
     reply.code(418);
   }
 
-  let key: string;
-
-  if (keyFromHeaders || keyFromQuery) {
-    key = keyFromHeaders || keyFromQuery;
-  }
+  const key: string = keyFromHeaders || keyFromQuery;
 
   if (!key) {
     reply.code(401).send({ error: 'API key is missing' });
@@ -102,9 +98,11 @@ export async function checkApiKeyConfig(
     request.data.attributes = apiKeyConfig.attributes;
   }
 
-  requestedAttributes.forEach((field) => {
-    if (!apiKeyConfig.attributes.includes(field)) {
-      reply.code(403).send({ error: `You don't have access to ${field}` });
-    }
-  });
+  const unauthorizedAttr = requestedAttributes.filter(
+    (field) => !apiKeyConfig.attributes.includes(field),
+  );
+
+  if (unauthorizedAttr.length > 0) {
+    reply.code(403).send({ error: `You don't have access to [${unauthorizedAttr}]` });
+  }
 }

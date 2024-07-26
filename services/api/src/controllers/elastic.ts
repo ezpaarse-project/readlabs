@@ -17,7 +17,10 @@ export async function pingElasticController(
 ): Promise<void> {
   await pingElastic();
   const endTime = Date.now();
-  reply.code(200).send({ message: 'Pong', elapsedTime: endTime - request.startTime });
+  const responseTime = endTime - request.startTime;
+  reply.code(200)
+    .send({ message: 'Pong', responseTime })
+    .headers({ 'x-response-time': responseTime });
 }
 
 /**

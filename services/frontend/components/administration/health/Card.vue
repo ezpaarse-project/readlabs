@@ -13,7 +13,7 @@
           :loading="loading"
           @click.stop="getHealth()"
           >
-          {{ health?.elapsedTime }} ms
+          {{ health?.responseTime }} ms
         </v-btn>
       </v-row>
     </v-card-title>

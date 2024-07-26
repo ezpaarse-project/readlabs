@@ -37,6 +37,22 @@ export function initClient() {
     throw err;
   }
 
+  redisClient.on('connect', () => {
+    appLogger.info('[redis]: redis is connect');
+  });
+
+  redisClient.on('ready', () => {
+    appLogger.info('[redis]: redis is ready');
+  });
+
+  redisClient.on('error', (err) => {
+    appLogger.error(`[redis]: redis in on error [${err}]`);
+  });
+
+  redisClient.on('reconnecting', () => {
+    appLogger.error('[redis]: reconnecting');
+  });
+
   redisGet = promisify(redisClient.get);
   redisPing = promisify(redisClient.ping);
   redisSet = promisify(redisClient.set);
@@ -45,11 +61,11 @@ export function initClient() {
 }
 
 /**
- * Ping redis service.
+ * Check if redis client is up.
  *
- * @returns ping.
+ * @returns Redis client is up.
  */
-export async function ping(): Promise<boolean> {
+async function checkClientUp(): Promise<boolean> {
   try {
     if (!redisPing) {
       throw new Error('[redis]: Client is not created');
@@ -60,6 +76,28 @@ export async function ping(): Promise<boolean> {
     appLogger.error(`[redis]: Cannot ping ${redis.host}:${redis.port}`, err);
     return false;
   }
+  return true;
+}
+
+/**
+ * Ping redis service.
+ *
+ * @returns ping.
+ */
+export async function ping(): Promise<boolean> {
+  const redisUp: boolean = await checkClientUp();
+
+  if (!redisUp) {
+    return false;
+  }
+
+  try {
+    await redisPing();
+  } catch (err) {
+    appLogger.error(`[redis]: Cannot ping ${redis.host}:${redis.port}`, err);
+    return false;
+  }
+
   appLogger.info(`[redis]: Success ping to ${redis.host}:${redis.port}`);
   return true;
 }
@@ -70,6 +108,9 @@ export async function ping(): Promise<boolean> {
  * @returns is started.
  */
 export async function startConnection(): Promise<void> {
+  if (!redisClient) {
+    throw new Error('[redis]: Client is already set');
+  }
   try {
     await redisClient.connect();
   } catch (err) {
@@ -87,8 +128,10 @@ export async function startConnection(): Promise<void> {
  * @returns Is exist.
  */
 export async function check(apikey: string): Promise<boolean> {
-  if (!redisGet) {
-    throw new Error('[redis]: Client is not created');
+  const redisUp: boolean = await checkClientUp();
+
+  if (!redisUp) {
+    throw new Error('[redis]: Redis client is not up');
   }
 
   return !!await redisGet(apikey);
@@ -100,25 +143,33 @@ export async function check(apikey: string): Promise<boolean> {
  * @returns apikey config
  */
 export async function get(apikey: string): Promise<ApiKeyConfig | null> {
-  let apikeyConfig;
+  const redisUp: boolean = await checkClientUp();
+
+  if (!redisUp) {
+    throw new Error('[redis]: Redis client is not up');
+  }
+
+  let apikeyConfig: string;
   try {
     if (!redisGet) {
       throw new Error('[redis]: Client is not created');
     }
-
     apikeyConfig = await redisGet(apikey);
   } catch (err) {
     appLogger.error(`[redis]: Cannot get config of apikey [${apikey}]`, err);
     throw err;
   }
+
+  let apikeyConfigParsed: ApiKeyConfig;
+
   try {
-    apikeyConfig = JSON.parse(apikeyConfig);
+    apikeyConfigParsed = JSON.parse(apikeyConfig);
   } catch (err) {
     appLogger.error(`[redis]: Cannot parse to json [${apikeyConfig}]`, err);
     throw err;
   }
 
-  return apikeyConfig;
+  return apikeyConfigParsed;
 }
 
 /**
@@ -127,12 +178,15 @@ export async function get(apikey: string): Promise<ApiKeyConfig | null> {
  * @returns all API Keys.
  */
 export async function getAllKeys(): Promise<string[] | null> {
-  let keys: string[];
-  try {
-    if (!redisKeys) {
-      throw new Error('[redis]: Client is not created');
-    }
+  const redisUp: boolean = await checkClientUp();
 
+  if (!redisUp) {
+    throw new Error('[redis]: Redis client is not up');
+  }
+
+  let keys: string[];
+
+  try {
     keys = await redisKeys('*');
   } catch (err) {
     appLogger.error('[redis]: Cannot get all keys');
@@ -148,12 +202,18 @@ export async function getAllKeys(): Promise<string[] | null> {
  * @returns all API Keys with their config.
  */
 export async function getAll(): Promise<ApiKey[] | null> {
-  const keys = await getAllKeys();
+  const redisUp: boolean = await checkClientUp();
 
-  const allKeys: Array<ApiKey> = [];
+  if (!redisUp) {
+    throw new Error('[redis]: Redis client is not up');
+  }
 
-  const promises = keys.map(async (key) => {
-    let config;
+  const keys: string[] = await getAllKeys();
+
+  const allKeys: ApiKey[] = [];
+
+  const promises = keys.map(async (key: string) => {
+    let config : ApiKeyConfig;
     try {
       config = await get(key);
     } catch (err) {
@@ -174,10 +234,15 @@ export async function getAll(): Promise<ApiKey[] | null> {
  *
  * @returns random key.
  */
-function createRandomKey(): string {
-  const currentDate = Date.now();
-  const random = Math.random().toString();
-  return createHash('sha256').update(`${currentDate}${random}`).digest('hex');
+async function createRandomKey(): Promise<string> {
+  const currentDate: number = Date.now();
+  const random: string = Math.random().toString();
+  const key: string = createHash('sha256').update(`${currentDate}${random}`).digest('hex');
+  const isExist: boolean = await check(key);
+  if (isExist) {
+    return createRandomKey();
+  }
+  return key;
 }
 
 /**
@@ -185,7 +250,13 @@ function createRandomKey(): string {
  *
  * @returns new API key and his config.
  */
-export async function create(apiKeyConfig): Promise<ApiKey | null> {
+export async function create(apiKeyConfig: ApiKeyConfig): Promise<ApiKey | null> {
+  const redisUp: boolean = await checkClientUp();
+
+  if (!redisUp) {
+    throw new Error('[redis]: Redis client is not up');
+  }
+
   const {
     name, owner, description,
   } = apiKeyConfig;
@@ -196,8 +267,9 @@ export async function create(apiKeyConfig): Promise<ApiKey | null> {
   } = apiKeyConfig;
 
   if (typeof allowed !== 'boolean') allowed = true;
-  if (attributes.length === labsAttributes.length) { attributes = ['*']; }
-  if (!attributes) { attributes = ['*']; }
+  if (!attributes || attributes.length === labsAttributes.length) {
+    attributes = ['*'];
+  }
 
   const keys = await getAll();
 
@@ -211,8 +283,9 @@ export async function create(apiKeyConfig): Promise<ApiKey | null> {
     }
   }
 
-  const newKey = createRandomKey();
-  const realApiKeyConfig = {
+  const newKey: string = await createRandomKey();
+
+  const newApiKeyConfig: ApiKeyConfig = {
     name,
     owner,
     description,
@@ -222,13 +295,13 @@ export async function create(apiKeyConfig): Promise<ApiKey | null> {
   };
 
   try {
-    await redisClient.set(newKey, `${JSON.stringify(realApiKeyConfig)}`);
+    await redisClient.set(newKey, `${JSON.stringify(newApiKeyConfig)}`);
   } catch (err) {
-    appLogger.error(`[redis]: Cannot create apikey with config [${realApiKeyConfig}]`, err);
+    appLogger.error(`[redis]: Cannot create apikey with config [${newApiKeyConfig}]`, err);
     throw new Error('Cannot create apikey');
   }
 
-  return { apikey: newKey, config: realApiKeyConfig };
+  return { apikey: newKey, config: newApiKeyConfig };
 }
 
 /**
@@ -239,12 +312,19 @@ export async function create(apiKeyConfig): Promise<ApiKey | null> {
  *
  * @returns New config.
  */
-export async function update(apikey, apikeyConfig) {
+export async function update(apikey: string, apikeyConfig: ApiKeyConfig): Promise<ApiKeyConfig> {
+  const redisUp: boolean = await checkClientUp();
+
+  if (!redisUp) {
+    throw new Error('[redis]: Redis client is not up');
+  }
+
   const {
     name, owner, description, attributes, allowed,
   } = apikeyConfig;
 
   const config = await get(apikey);
+
   if (name) config.name = name;
   if (attributes) config.attributes = attributes;
   if (typeof owner === 'string') config.owner = owner;
@@ -269,6 +349,12 @@ export async function update(apikey, apikeyConfig) {
  * @param apikey API key.
  */
 export async function remove(apikey: string): Promise<void> {
+  const redisUp: boolean = await checkClientUp();
+
+  if (!redisUp) {
+    throw new Error('[redis]: Redis client is not up');
+  }
+
   try {
     await redisDel(apikey);
   } catch (err) {
@@ -281,6 +367,12 @@ export async function remove(apikey: string): Promise<void> {
  * Load dev API key.
  */
 export async function loadDev() {
+  const redisUp: boolean = await checkClientUp();
+
+  if (!redisUp) {
+    throw new Error('[redis]: Redis client is not up');
+  }
+
   const { default: apiKeys } = await import('../../apikey-dev.json');
 
   for (let i = 0; i < apiKeys.length; i += 1) {

@@ -53,16 +53,24 @@ const start = async () => {
 
   fastify.setValidatorCompiler(({ schema }) => ajv.compile(schema));
 
-  // Measure response time
-  fastify.addHook('onRequest', (request, reply, done) => {
-    request.startTime = Date.now();
-    done();
+  fastify.addHook('onRequest', async (
+    request: FastifyRequest,
+  ): Promise<void> => {
+    request.data = {};
   });
 
-  fastify.addHook('onResponse', (request, reply, done) => {
+  // Measure response time
+  fastify.addHook('onRequest', async (
+    request: FastifyRequest,
+  ): Promise<void> => {
+    request.startTime = Date.now();
+  });
+
+  fastify.addHook('onResponse', async (
+    request: FastifyRequest,
+  ): Promise<void> => {
     request.endTime = Date.now();
-    request.time = request.endTime - request.startTime;
-    done();
+    request.responseTime = request.endTime - request.startTime;
   });
 
   // access logger
@@ -91,6 +99,7 @@ const start = async () => {
       contentLength: reply.getHeader('content-length') || 0,
       userAgent: request.headers['user-agent'] || '-',
       apiKeyName,
+      responseTime: request.responseTime,
     });
   });
 
@@ -114,12 +123,21 @@ const start = async () => {
   logConfig();
 
   // ping
-  initClientElastic();
-  await pingElastic();
 
-  initClientRedis();
-  await startConnectionRedis();
-  await pingRedis();
+  try {
+    await initClientElastic();
+    await pingElastic();
+  } catch (err) {
+    appLogger.error('[fastify]: Cannot initiate elastic client');
+  }
+
+  try {
+    await initClientRedis();
+    await startConnectionRedis();
+    await pingRedis();
+  } catch (err) {
+    appLogger.error('[fastify]: Cannot initiate redis client');
+  }
 
   if (cleanLogFileCron.active) {
     cleanLogFileCron.start();

@@ -8,8 +8,8 @@ const router: FastifyPluginAsync = async (fastify) => {
     url: '/',
     schema: {},
     preHandler: all,
-    handler: async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
-      reply.code(200).send('api service');
+    handler: async (_request: FastifyRequest, reply: FastifyReply): Promise<void> => {
+      reply.code(200).send('readlabs api service');
     },
   });
 
@@ -20,7 +20,10 @@ const router: FastifyPluginAsync = async (fastify) => {
     preHandler: all,
     handler: async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
       const endTime = Date.now();
-      reply.code(200).send({ message: 'Pong', elapsedTime: endTime - request.startTime });
+      const responseTime = endTime - request.startTime;
+      reply.code(200)
+        .send({ message: 'Pong', responseTime })
+        .headers({ 'x-response-time': responseTime });
     },
   });
 };

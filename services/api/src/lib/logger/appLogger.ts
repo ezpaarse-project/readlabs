@@ -25,7 +25,7 @@ winston.loggers.add('app', {
       ),
     }),
     new DailyRotateFile({
-      filename: `${paths.log.accessDir}/%DATE%-application.log`,
+      filename: `${paths.log.applicationDir}/%DATE%-application.log`,
       datePattern: 'YYYY-MM-DD',
     }),
   ],

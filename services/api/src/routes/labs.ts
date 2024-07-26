@@ -25,6 +25,7 @@ const router: FastifyPluginAsync = async (fastify) => {
             isAllowedAttribute: true,
             items: { type: 'string' },
             minItems: 1,
+            uniqueItems: true,
           },
         },
         required: ['ids'],
