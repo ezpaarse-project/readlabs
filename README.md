@@ -45,7 +45,7 @@ The tools you need to let readlabs run are :
 * docker
 * npm
 
-Command : 
+#### Commands 
 
 ```bash
 # install dependencies
@@ -53,10 +53,7 @@ npm i
 
 # create volume for elastic
 docker-compose -f docker-compose.debug.yml run --rm elastic chown -R elasticsearch /usr/share/elasticsearch/ 
-```
-#### Start
 
-```bash
 # Start readlabs as daemon
 docker-compose -f docker-compose.debug.yml up -d
 
@@ -75,12 +72,11 @@ No test are available (coming soon).
 #### Prerequisites
 
 * docker
-* docker compose
 * Total extracted data does not exceed 2000 rows
 
 #### Environment variables
 
-Create an environment file named `readlabs.local.env.sh` and export the following environment variables. You can then source `readlabs.env.sh`, which contains a set of predefined variables and is overridden by `readlabs.local.env.sh`.
+You can create an environment file named `readlabs.local.env.sh` and export the following environment variables. You can then source `readlabs.env.sh`, which contains a set of predefined variables and is overridden by `readlabs.local.env.sh`.
 
 
 ### Adjust system configuration for Elasticsearch
