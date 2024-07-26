@@ -8,7 +8,7 @@ import appLogger from '~/lib/logger/appLogger';
 
 import type { ApiKeyConfig, ApiKey } from '~/models/apikey';
 
-import labsAttributes from '../../mapping/labs.attributes.json';
+import labsAttributes from '../../mapping/lab.attributes.json';
 
 let redisClient: RedisClientType | undefined;
 

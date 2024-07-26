@@ -1,6 +1,6 @@
 import Ajv from 'ajv';
 
-import allowedAttributes from '~/../mapping/labs.attributes.json';
+import allowedAttributes from '~/../mapping/lab.attributes.json';
 
 const ajv = new Ajv();
 

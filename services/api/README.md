@@ -57,7 +57,7 @@ TODO
 
 ### Elastic mapping
 
-- [readlabs](./mapping/labs.json)
+- [readlabs](./mapping/lab.json)
 
 ## Open API
 
