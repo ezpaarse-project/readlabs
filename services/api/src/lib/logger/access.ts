@@ -12,7 +12,7 @@ const apacheFormat = winston.format.printf((info: winston.Logform.TransformableI
     userAgent,
     responseTime,
   } = info.message;
-  return `${info.timestamp} ${apiKeyName} ${method} ${url} ${statusCode} ${contentLength} ${userAgent} ${responseTime}ms`;
+  return `${info.timestamp} ${apiKeyName} ${method} ${url} ${statusCode} ${contentLength} ${userAgent} ${responseTime}`;
 });
 
 export default winston.createLogger({

@@ -53,31 +53,22 @@ const start = async () => {
 
   fastify.setValidatorCompiler(({ schema }) => ajv.compile(schema));
 
+  // Measure response time and add default data
   fastify.addHook('onRequest', async (
     request: FastifyRequest,
   ): Promise<void> => {
     request.data = {};
-  });
-
-  // Measure response time
-  fastify.addHook('onRequest', async (
-    request: FastifyRequest,
-  ): Promise<void> => {
     request.startTime = Date.now();
   });
 
-  fastify.addHook('onResponse', async (
-    request: FastifyRequest,
-  ): Promise<void> => {
-    request.endTime = Date.now();
-    request.responseTime = request.endTime - request.startTime;
-  });
-
-  // access logger
+  // access logger and add endTime
   fastify.addHook('onResponse', async (
     request: FastifyRequest,
     reply: FastifyReply,
   ):Promise<void> => {
+    request.endTime = Date.now();
+    request.responseTime = request.endTime - request.startTime;
+
     if (request.url === '/healthcheck') {
       return;
     }
@@ -99,7 +90,7 @@ const start = async () => {
       contentLength: reply.getHeader('content-length') || 0,
       userAgent: request.headers['user-agent'] || '-',
       apiKeyName,
-      responseTime: request.responseTime,
+      responseTime: request.responseTime ? `${request.responseTime}ms` : '-',
     });
   });
 

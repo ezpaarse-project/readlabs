@@ -16,8 +16,6 @@
 
 <script setup>
 
-;
-
 let visible = ref(false);
 
 const emit = defineEmits({
