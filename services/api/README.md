@@ -13,7 +13,7 @@ To set up this service, you can use environment variables. The config is display
 [app] warn: [config]: ApiKey has the default value 
 [app] info: {
   "nodeEnv": "development",
-  "timezone": "Europe/Paris",
+  "tz": "Europe/Paris",
   "redis": {
     "host": "redis",
     "port": "6379",
@@ -42,7 +42,7 @@ To set up this service, you can use environment variables. The config is display
 | name | default | description |
 | --- | --- | --- |
 | NODE_ENV | development | environment of node |
-| TIMEZONE | Europe/Paris | timezone of app used in cron |
+| TZ | Europe/Paris | timezone of app used in cron |
 | REDIS_HOST | redis | redis host |
 | REDIS_PORT | 6379 | redis port |
 | REDIS_PASSWORD | changeme | redis password |

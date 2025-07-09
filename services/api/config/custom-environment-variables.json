@@ -1,6 +1,6 @@
 {
   "nodeEnv": "NODE_ENV",
-  "timezone": "TIMEZONE",
+  "timezone": "TZ",
   "redis": {
     "host": "REDIS_HOST",
     "port": "REDIS_PORT",
